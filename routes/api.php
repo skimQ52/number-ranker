@@ -12,3 +12,5 @@ Route::get('/user', function (Request $request) {
 Route::post('/numbers', [NumberController::class, 'vote']);
 
 Route::get('/numbers', [NumberController::class, 'duo']);
+
+Route::get('/rankings', [NumberController::class, 'index']);

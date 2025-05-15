@@ -15,6 +15,8 @@ return new class extends Migration
             $table->id();
             $table->integer('number');
             $table->integer('elo');
+            $table->integer('wins');
+            $table->integer('losses');
             $table->timestamps();
         });
     }
