@@ -142,7 +142,7 @@
         </div>
         <div v-else class="flex flex-col w-1/2 h-140 md:h-250 justify-between lg:flex-row lg:w-full lg:h-150">
             <div class="h-full w-full flex flex-col gap-8 items-center text-center justify-center">
-                <span class="text-3xl font-bold text-gray-600">Thank You</span>
+                <span class="text-3xl font-bold text-gray-600">Thank You!</span>
                 <span class="text-2xl text-gray-600">You've made all of your votes for today</span>
                 <Link
                     :href="route('leaderboard')"
