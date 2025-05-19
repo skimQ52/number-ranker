@@ -6,6 +6,7 @@ use App\Models\Number;
 use App\Services\EloService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 
 class NumberController extends Controller
@@ -16,6 +17,16 @@ class NumberController extends Controller
             'winner' => 'required|integer',
             'loser' => 'required|integer'
         ]);
+
+        $ip = $request->ip();
+        $cacheKey = "votes_by_ip_{$ip}";
+
+        $votes = Cache::get($cacheKey, 0);
+        if ($votes >= 15) {
+            return response()->json(['message' => 'Vote limit reached'], 429);
+        }
+
+        Cache::put($cacheKey, $votes + 1, now()->addDay()); // Cache for a day
 
         $winner = Number::query()->find($validated['winner']);
         $loser = Number::query()->find($validated['loser']);
@@ -38,6 +49,14 @@ class NumberController extends Controller
 
     public function duo(Request $request): JsonResponse
     {
+        $ip = $request->ip();
+        $cacheKey = "votes_by_ip_{$ip}";
+
+        $votes = Cache::get($cacheKey, 0);
+        if ($votes >= 15) {
+            return response()->json(['message' => 'Vote limit reached'], 429);
+        }
+
         $randomLeft = rand(1,100);
         $randomRight = rand(1,100);
 

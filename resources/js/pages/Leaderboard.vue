@@ -45,11 +45,11 @@ onMounted(() => {
                     :key="number.id"
                     class="flex items-center justify-between p-4"
                 >
-                    <span>{{index + 1}}.</span>
-                    <div class="flex items-center gap-4">
+                    <span class="w-1/3 text-left">{{index + 1}}.</span>
+                    <div class="w-1/3 flex justify-center gap-4">
                         <span class="text-3xl">{{ number.number }}</span>
                     </div>
-                    <div>
+                    <div class="w-1/3 text-right">
                         <span class="text-lg font-mono text-green-500">{{ number.wins }}</span>
                         <span class="text-lg font-mono">-</span>
                         <span class="text-lg font-mono text-red-500">{{ number.losses }}</span>

@@ -1,27 +1,42 @@
 <script setup lang="ts">
 import { Head, Link } from '@inertiajs/vue3';
 import { onMounted, ref } from 'vue';
+import { canVoteToday, recordVote } from '@/Utils/voteHandler';
 
 const leftNum = ref(0);
 const rightNum = ref(0);
+const canVote = ref(true);
 
 async function fetchNumbers() {
     try {
         const res = await fetch('http://localhost:8000/api/numbers')
-        if (!res.ok) throw new Error('Network response was not ok')
+        if (res.status === 429) {
+            canVote.value = false;
+        }
+        else if (!res.ok) throw new Error('Network response was not ok')
         const data = await res.json()
         leftNum.value = data.left;
         rightNum.value = data.right;
     } catch (error) {
-        console.error('Failed to fetch user:', error)
+        console.error('Failed to fetch numbers:', error)
     }
 }
 
 onMounted(() => {
-    fetchNumbers()
+    canVote.value = canVoteToday();
+    if (canVote.value) {
+        fetchNumbers()
+    }
 })
 
 function vote(winner:number) {
+
+    if (!canVote.value) {
+        return;
+    }
+
+    recordVote();
+    canVote.value = canVoteToday();
 
     const loser = winner === rightNum.value ? leftNum.value : rightNum.value;
 
@@ -43,6 +58,7 @@ function vote(winner:number) {
         })
         .then(responseData => {
             console.log('Success:', responseData);
+            fetchNumbers();
         })
         .catch(error => {
             console.error('Error:', error);
@@ -67,18 +83,30 @@ function vote(winner:number) {
                 </Link>
             </nav>
         </header>
-        <div class="mt-10 lg:mt-0">
+        <div class="mt-10">
             <h1 class="text-3xl sm:text-4xl md:text-5xl text-gray-500 font-bold text-center mb-8">
                 Pick The Better Number!
             </h1>
         </div>
-        <div class="flex flex-col w-1/2 h-140 md:h-250 justify-between lg:flex-row lg:w-full lg:h-170">
+        <div v-if="canVote" class="flex flex-col w-1/2 h-140 md:h-250 justify-between lg:flex-row lg:w-full lg:h-170">
             <button @click="vote(leftNum)" class="h-1/2 lg:w-1/2 lg:h-full flex justify-center items-center hover:bg-gray-800 hover:outline-1 hover:outline-amber-50 transition duration-300 cursor-pointer">
                 <span class="text-9xl text-amber-50">{{leftNum}}</span>
             </button>
             <button @click="vote(rightNum)" class="h-1/2 lg:w-1/2 lg:h-full flex justify-center items-center hover:bg-gray-800 hover:outline-1 hover:outline-amber-50 transition duration-300 cursor-pointer">
                 <span class="text-9xl text-amber-50 ">{{rightNum}}</span>
             </button>
+        </div>
+        <div v-else class="flex flex-col w-1/2 h-140 md:h-250 justify-between lg:flex-row lg:w-full lg:h-150">
+            <div class="h-full w-full flex flex-col gap-8 items-center text-center justify-center">
+                <span class="text-3xl font-bold text-gray-600">Thank You</span>
+                <span class="text-2xl text-gray-600">You've made all of your votes for today</span>
+                <Link
+                    :href="route('leaderboard')"
+                    class="bg-gray-900 inline-block rounded-sm border border-transparent px-5 py-1.5 text-sm leading-normal text-[#1b1b18] hover:border-[#19140035] dark:text-[#EDEDEC] dark:hover:border-[#3E3E3A]"
+                >
+                    See the Leaderboard
+                </Link>
+            </div>
         </div>
     </div>
 </template>
