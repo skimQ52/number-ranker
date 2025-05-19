@@ -6,6 +6,7 @@
     const leftNum = ref(0);
     const rightNum = ref(0);
     const canVote = ref(true);
+    const showDialog = ref(false)
 
     const title = 'Pick The Better Number!';
     const titleChars = title.split('');
@@ -85,7 +86,7 @@
                 </Link>
             </nav>
         </header>
-        <div class="select-none mt-10">
+        <div class="select-none mt-10 flex gap-4">
             <h1 class="whitespace-pre text-3xl sm:text-4xl md:text-5xl text-gray-500 font-bold text-center mb-8">
                 <span
                       v-for="(char, index) in titleChars"
@@ -95,6 +96,34 @@
                     {{ char }}
                 </span>
             </h1>
+            <div>
+                <button
+                    @click="showDialog = true"
+                    class="bg-gray-700 text-white rounded-full w-10 h-10 text-2xl font-bold flex items-center justify-center shadow-lg cursor-pointer hover:bg-gray-500"
+                >
+                    ?
+                </button>
+
+                <div
+                    v-if="showDialog"
+                    @click.self="showDialog = false"
+                    class="fixed inset-0 bg-black/50 flex items-center justify-center z-50"
+                >
+                    <div class="bg-white rounded-lg p-6 shadow-xl max-w-md w-full relative">
+                        <button
+                            @click="showDialog = false"
+                            class="absolute top-2 right-2 text-gray-400 hover:text-gray-600 text-xl"
+                        >
+                            X
+                        </button>
+                        <h2 class="text-xl font-bold mb-4">Need Help?</h2>
+                        <p class="text-gray-700">
+                            Pick the number YOU think is better.<br><br>There’s no right or wrong — go with your gut!
+                            Whether it’s lucky, mathematical, or just your favorite athlete’s number, your opinion matters!
+                        </p>
+                    </div>
+                </div>
+            </div>
         </div>
         <div v-if="canVote" class="flex flex-col w-1/2 h-140 md:h-250 justify-between lg:flex-row lg:w-full lg:h-170">
             <button @click="vote(leftNum)" class="h-1/2 lg:w-1/2 lg:h-full flex justify-center items-center hover:bg-gray-800 hover:outline-1 hover:outline-amber-50 transition duration-300 cursor-pointer">
