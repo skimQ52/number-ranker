@@ -1,70 +1,72 @@
 <script setup lang="ts">
-import { Head, Link } from '@inertiajs/vue3';
-import { onMounted, ref } from 'vue';
-import { canVoteToday, recordVote } from '@/Utils/voteHandler';
+    import { Head, Link } from '@inertiajs/vue3';
+    import { onMounted, ref } from 'vue';
+    import { canVoteToday, recordVote } from '@/Utils/voteHandler';
 
-const leftNum = ref(0);
-const rightNum = ref(0);
-const canVote = ref(true);
+    const leftNum = ref(0);
+    const rightNum = ref(0);
+    const canVote = ref(true);
 
-async function fetchNumbers() {
-    try {
-        const res = await fetch('http://localhost:8000/api/numbers')
-        if (res.status === 429) {
-            canVote.value = false;
-        }
-        else if (!res.ok) throw new Error('Network response was not ok')
-        const data = await res.json()
-        leftNum.value = data.left;
-        rightNum.value = data.right;
-    } catch (error) {
-        console.error('Failed to fetch numbers:', error)
-    }
-}
+    const title = 'Pick The Better Number!';
+    const titleChars = title.split('');
 
-onMounted(() => {
-    canVote.value = canVoteToday();
-    if (canVote.value) {
-        fetchNumbers()
-    }
-})
-
-function vote(winner:number) {
-
-    if (!canVote.value) {
-        return;
-    }
-
-    recordVote();
-    canVote.value = canVoteToday();
-
-    const loser = winner === rightNum.value ? leftNum.value : rightNum.value;
-
-    fetch('http://localhost:8000/api/numbers', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-            winner: winner,
-            loser: loser
-        })
-    })
-        .then(response => {
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
+    async function fetchNumbers() {
+        try {
+            const res = await fetch('http://localhost:8000/api/numbers')
+            if (res.status === 429) {
+                canVote.value = false;
             }
-            return response.json();
-        })
-        .then(responseData => {
-            console.log('Success:', responseData);
-            fetchNumbers();
-        })
-        .catch(error => {
-            console.error('Error:', error);
-        });
-}
+            else if (!res.ok) throw new Error('Network response was not ok')
+            const data = await res.json()
+            leftNum.value = data.left;
+            rightNum.value = data.right;
+        } catch (error) {
+            console.error('Failed to fetch numbers:', error)
+        }
+    }
 
+    onMounted(() => {
+        canVote.value = canVoteToday();
+        if (canVote.value) {
+            fetchNumbers()
+        }
+    })
+
+    function vote(winner:number) {
+
+        if (!canVote.value) {
+            return;
+        }
+
+        recordVote();
+        canVote.value = canVoteToday();
+
+        const loser = winner === rightNum.value ? leftNum.value : rightNum.value;
+
+        fetch('http://localhost:8000/api/numbers', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                winner: winner,
+                loser: loser
+            })
+        })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(responseData => {
+                console.log('Success:', responseData);
+                fetchNumbers();
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+    }
 </script>
 
 <template>
@@ -83,9 +85,15 @@ function vote(winner:number) {
                 </Link>
             </nav>
         </header>
-        <div class="mt-10">
-            <h1 class="text-3xl sm:text-4xl md:text-5xl text-gray-500 font-bold text-center mb-8">
-                Pick The Better Number!
+        <div class="select-none mt-10">
+            <h1 class="whitespace-pre text-3xl sm:text-4xl md:text-5xl text-gray-500 font-bold text-center mb-8">
+                <span
+                      v-for="(char, index) in titleChars"
+                      :key="index"
+                      class="font-extrabold inline-block transition-transform duration-200 ease-in-out hover:scale-120"
+                  >
+                    {{ char }}
+                </span>
             </h1>
         </div>
         <div v-if="canVote" class="flex flex-col w-1/2 h-140 md:h-250 justify-between lg:flex-row lg:w-full lg:h-170">
