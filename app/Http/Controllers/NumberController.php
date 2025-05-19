@@ -6,6 +6,7 @@ use App\Models\Number;
 use App\Services\EloService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 
@@ -18,15 +19,22 @@ class NumberController extends Controller
             'loser' => 'required|integer'
         ]);
 
-        $ip = $request->ip();
-        $cacheKey = "votes_by_ip_{$ip}";
+        if (env('VOTE_RATE_LIMIT_ENABLED', false)) {
+            $ip = $request->ip();
+            $cacheKey = "votes_by_ip_{$ip}";
 
-        $votes = Cache::get($cacheKey, 0);
-        if ($votes >= 15) {
-            return response()->json(['message' => 'Vote limit reached'], 429);
+            $votes = Cache::get($cacheKey, 0);
+            if ($votes >= 15) {
+                return response()->json(['message' => 'Vote limit reached'], 429);
+            }
+
+            if (!Cache::has($cacheKey)) {
+                Cache::put($cacheKey, 1, now()->endOfDay());
+            } else {
+                Cache::increment($cacheKey);
+            }
         }
 
-        Cache::put($cacheKey, $votes + 1, now()->addDay()); // Cache for a day
 
         $winner = Number::query()->find($validated['winner']);
         $loser = Number::query()->find($validated['loser']);
@@ -44,17 +52,30 @@ class NumberController extends Controller
             'losses' => $winner->losses + 1,
         ]);
 
+        $cacheKey = 'votes_' . Carbon::today()->toDateString();
+
+        if (!Cache::has($cacheKey)) {
+            Cache::put($cacheKey, 1, now()->endOfDay());
+        } else {
+            Cache::increment($cacheKey);
+        }
+
+        $votesToday = Cache::get('votes_' . Carbon::today()->toDateString(), 0);
+        logger()->debug('votes today after voting'.$votesToday);
+
         return response()->json(['Winner' => $winner, 'Loser' => $loser], 200);
     }
 
     public function duo(Request $request): JsonResponse
     {
-        $ip = $request->ip();
-        $cacheKey = "votes_by_ip_{$ip}";
+        if (env('VOTE_RATE_LIMIT_ENABLED', false)) {
+            $ip = $request->ip();
+            $cacheKey = "votes_by_ip_{$ip}";
 
-        $votes = Cache::get($cacheKey, 0);
-        if ($votes >= 15) {
-            return response()->json(['message' => 'Vote limit reached'], 429);
+            $votes = Cache::get($cacheKey, 0);
+            if ($votes >= 15) {
+                return response()->json(['message' => 'Vote limit reached'], 429);
+            }
         }
 
         $randomLeft = rand(1,100);
@@ -67,7 +88,14 @@ class NumberController extends Controller
         $leftNumber = Number::query()->find($randomLeft);
         $rightNumber = Number::query()->find($randomRight);
 
-        return response()->json(['left' => $leftNumber->number, 'right' => $rightNumber->number]);
+        $votesToday = Cache::get('votes_' . Carbon::today()->toDateString(), 0);
+        logger()->debug($votesToday);
+
+        return response()->json([
+            'left' => $leftNumber->number,
+            'right' => $rightNumber->number,
+            'votes' => $votesToday,
+        ]);
     }
 
     public function index(): JsonResponse
