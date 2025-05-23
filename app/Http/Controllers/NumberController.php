@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Number;
 use App\Services\EloService;
+use App\Services\NumberService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
@@ -15,8 +16,8 @@ class NumberController extends Controller
     public function vote(EloService $eloService, Request $request): JsonResponse
     {
         $validated = $request->validate([
-            'winner' => 'required|integer',
-            'loser' => 'required|integer'
+            'winner' => 'required|integer|between:1,99',
+            'loser' => 'required|integer|between:1,99'
         ]);
 
         if (env('VOTE_RATE_LIMIT_ENABLED', false)) {
@@ -60,10 +61,7 @@ class NumberController extends Controller
             Cache::increment($cacheKey);
         }
 
-        $votesToday = Cache::get('votes_' . Carbon::today()->toDateString(), 0);
-        logger()->debug('votes today after voting'.$votesToday);
-
-        return response()->json(['Winner' => $winner, 'Loser' => $loser], 200);
+        return $this->returnForNextVote();
     }
 
     public function duo(Request $request): JsonResponse
@@ -78,24 +76,7 @@ class NumberController extends Controller
             }
         }
 
-        $randomLeft = rand(1,100);
-        $randomRight = rand(1,100);
-
-        while($randomLeft === $randomRight) {
-            $randomRight = rand(1,100);
-        }
-
-        $leftNumber = Number::query()->find($randomLeft);
-        $rightNumber = Number::query()->find($randomRight);
-
-        $votesToday = Cache::get('votes_' . Carbon::today()->toDateString(), 0);
-        logger()->debug($votesToday);
-
-        return response()->json([
-            'left' => $leftNumber->number,
-            'right' => $rightNumber->number,
-            'votes' => $votesToday,
-        ]);
+        return $this->returnForNextVote();
     }
 
     public function index(): JsonResponse
@@ -103,5 +84,22 @@ class NumberController extends Controller
         $numbers = DB::table('numbers')->orderBy('elo', 'desc')->get();
 
         return response()->json($numbers);
+    }
+
+    /**
+     * @return JsonResponse
+     */
+    public function returnForNextVote(): JsonResponse
+    {
+        [$leftNumber, $rightNumber] = NumberService::duo();
+        $votesToday = Cache::get('votes_' . Carbon::today()->toDateString(), 0);
+        $totalVotes = Number::query()->sum('wins');
+
+        return response()->json([
+            'left' => $leftNumber->number,
+            'right' => $rightNumber->number,
+            'votes' => $votesToday,
+            'total' => $totalVotes,
+        ]);
     }
 }

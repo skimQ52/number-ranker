@@ -1,12 +1,22 @@
 <script setup lang="ts">
     import { Head, Link } from '@inertiajs/vue3';
     import { onMounted, ref } from 'vue';
-    import { canVoteToday, getMyVotes, recordVote } from '@/Utils/voteHandler';
+    import {
+        canVoteToday,
+        clearNumberLeft, clearNumberRight,
+        getMyVotes,
+        getNumberLeft,
+        getNumberRight,
+        setNumberLeft,
+        setNumberRight,
+        recordVote
+    } from '@/Utils/voteHandler';
 
     const leftNum = ref(0);
     const rightNum = ref(0);
     const canVote = ref(true);
     const votesToday = ref(0);
+    const totalVotes = ref(0);
     const myVotes = ref(0);
     const showDialog = ref(false)
 
@@ -21,16 +31,21 @@
             }
             else if (!res.ok) throw new Error('Network response was not ok')
             const data = await res.json()
-            leftNum.value = data.left;
-            rightNum.value = data.right;
+            if (getNumberLeft() == 0 || getNumberRight() == 0) {
+                setNumberLeft(data.left);
+                setNumberRight(data.right);
+            }
             votesToday.value = data.votes;
+            totalVotes.value = data.total;
         } catch (error) {
             console.error('Failed to fetch numbers:', error)
         }
     }
 
     onMounted(() => {
-        fetchNumbers()
+        fetchNumbers();
+        leftNum.value = getNumberLeft();
+        rightNum.value = getNumberRight();
         canVote.value = canVoteToday();
         myVotes.value = getMyVotes();
     })
@@ -65,10 +80,17 @@
             })
             .then(responseData => {
                 console.log('Success:', responseData);
-                fetchNumbers();
+                leftNum.value = responseData.left;
+                rightNum.value = responseData.right;
+                setNumberLeft(responseData.left);
+                setNumberRight(responseData.right);
+                votesToday.value = responseData.votes;
+                totalVotes.value = responseData.total;
             })
             .catch(error => {
                 console.error('Error:', error);
+                clearNumberLeft();
+                clearNumberRight();
             });
     }
 </script>
@@ -89,12 +111,12 @@
                 </Link>
             </nav>
             <div class="flex h-full text-center items-center mr-4">
-                <h1 class="text-md text-gray-400">You've made {{myVotes}} lifetime votes!</h1>
+                <h1 class="text-md text-gray-400">You've made <span class="font-bold text-blue-500">{{ myVotes }}</span> lifetime votes!</h1>
             </div>
         </header>
         <div class="flex flex-col mt-10 gap-2 mb-2">
             <div class="select-none flex items-center gap-4">
-                <h1 class="whitespace-pre text-2xl sm:text-3xl md:text-4xl text-gray-500 font-bold text-center">
+                <h1 class="whitespace-pre text-2xl sm:text-3xl md:text-4xl text-blue-400 font-bold text-center">
                     <span
                           v-for="(char, index) in titleChars"
                           :key="index"
@@ -123,18 +145,23 @@
                             >
                                 X
                             </button>
-                            <h2 class="text-xl font-bold mb-4">Need Help?</h2>
+                            <h2 class="text-xl font-bold mb-4">Confused?</h2>
                             <p class="text-gray-700">
-                                Pick the number YOU think is better.<br><br>There’s no right or wrong — go with your gut!
+                                Pick the number YOU think is better. It's that simple.<br><br>There’s no right or wrong — go with your gut!
                                 Whether it’s lucky, mathematical, or just your favorite athlete’s number, your opinion matters!
+                                <br><br>
+                                Check the leaderboards to see which numbers are winning, and which numbers are losing.
                             </p>
                         </div>
                     </div>
                 </div>
             </div>
-            <div class="w-full text-center">
-                <h3 class="text:xl sm:text-2xl text-gray-500">
-                    Votes today: <span>{{ votesToday }}</span>
+            <div class="flex justify-around w-full text-center">
+                <h3 class="text:xl sm:text-2xl text-gray-400">
+                    <span class="font-bold text-blue-500">{{ votesToday }}</span> Votes Today
+                </h3>
+                <h3 class="text:xl sm:text-2xl text-gray-400">
+                    <span class="font-bold text-blue-500">{{ totalVotes }}</span> Total Votes
                 </h3>
             </div>
         </div>
@@ -146,10 +173,10 @@
                 <span class="text-9xl text-amber-50 ">{{rightNum}}</span>
             </button>
         </div>
-        <div v-else class="flex flex-col w-1/2 h-140 md:h-250 justify-between lg:flex-row lg:w-full lg:h-150">
+        <div v-else class="flex flex-col w-2/3 h-140 md:w-1/2 md:h-250 justify-between lg:flex-row lg:w-full lg:h-150">
             <div class="h-full w-full flex flex-col gap-8 items-center text-center justify-center">
-                <span class="text-3xl font-bold text-gray-600">Thank You!</span>
-                <span class="text-2xl text-gray-600">You've made all of your votes for today</span>
+                <span class="text-3xl sm:text-4xl font-bold text-gray-500">Thank You!</span>
+                <span class="text-xl sm:text-2xl text-gray-600">You've made all of your votes for today</span>
                 <Link
                     :href="route('leaderboard')"
                     class="bg-gray-900 inline-block rounded-sm border border-transparent px-5 py-1.5 text-sm leading-normal text-[#1b1b18] hover:border-[#19140035] dark:text-[#EDEDEC] dark:hover:border-[#3E3E3A]"

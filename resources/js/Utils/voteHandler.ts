@@ -2,6 +2,8 @@ const MAX_VOTES_PER_DAY = 30;
 const VOTE_KEY = 'user_votes';
 const VOTE_TOTALS_KEY = 'users_total_votes';
 const VOTE_DATE_KEY = 'vote_date';
+const NUMBER_LEFT_KEY = 'number_left';
+const NUMBER_RIGHT_KEY = 'number_right';
 
 export function canVoteToday(): boolean {
     const today = new Date().toDateString();
@@ -15,6 +17,30 @@ export function canVoteToday(): boolean {
     }
 
     return voteCount < MAX_VOTES_PER_DAY;
+}
+
+export function getNumberLeft(): number {
+    return parseInt(localStorage.getItem(NUMBER_LEFT_KEY) || '0');
+}
+
+export function getNumberRight(): number {
+    return parseInt(localStorage.getItem(NUMBER_RIGHT_KEY) || '0');
+}
+
+export function setNumberLeft(value: number) {
+    localStorage.setItem(NUMBER_LEFT_KEY, value.toString());
+}
+
+export function setNumberRight(value: number) {
+    localStorage.setItem(NUMBER_RIGHT_KEY, value.toString());
+}
+
+export function clearNumberLeft(): void {
+    localStorage.removeItem(NUMBER_LEFT_KEY);
+}
+
+export function clearNumberRight(): void {
+    localStorage.removeItem(NUMBER_RIGHT_KEY);
 }
 
 export function recordVote(): void {

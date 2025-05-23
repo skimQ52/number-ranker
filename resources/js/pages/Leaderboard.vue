@@ -39,7 +39,7 @@
                 </Link>
             </nav>
             <div class="flex h-full text-center items-center mr-4">
-                <h1 class="text-md text-gray-400">You've made {{myVotes}} lifetime votes!</h1>
+                <h1 class="text-md text-gray-400">You've made <span class="font-bold text-blue-500">{{ myVotes }}</span> lifetime votes!</h1>
             </div>
         </header>
         <div class="w-2/3 lg:w-3xl mx-auto py-8 flex-col text-center">
