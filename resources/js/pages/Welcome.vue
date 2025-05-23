@@ -14,7 +14,7 @@
 
     async function fetchNumbers() {
         try {
-            const res = await fetch('http://localhost:8000/api/numbers')
+            const res = await fetch('/api/numbers')
             if (res.status === 429) {
                 canVote.value = false;
             }
@@ -44,7 +44,7 @@
 
         const loser = winner === rightNum.value ? leftNum.value : rightNum.value;
 
-        fetch('http://localhost:8000/api/numbers', {
+        fetch('/api/numbers', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'

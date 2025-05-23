@@ -6,7 +6,7 @@ const numbers = ref();
 
 async function fetchLeaderboard() {
     try {
-        const res = await fetch('http://localhost:8000/api/rankings');
+        const res = await fetch('/api/rankings');
         if (!res.ok) throw new Error('Network response was not ok');
         numbers.value = await res.json();
     } catch (error) {
