@@ -1,5 +1,6 @@
 const MAX_VOTES_PER_DAY = 30;
 const VOTE_KEY = 'user_votes';
+const VOTE_TOTALS_KEY = 'users_total_votes';
 const VOTE_DATE_KEY = 'vote_date';
 
 export function canVoteToday(): boolean {
@@ -19,6 +20,7 @@ export function canVoteToday(): boolean {
 export function recordVote(): void {
     const today = new Date().toDateString();
     let voteCount = parseInt(localStorage.getItem(VOTE_KEY) || '0', 10);
+    let userTotalVotes = parseInt(localStorage.getItem(VOTE_TOTALS_KEY) || '0', 10);
 
     if (localStorage.getItem(VOTE_DATE_KEY) !== today) {
         localStorage.setItem(VOTE_DATE_KEY, today);
@@ -26,5 +28,11 @@ export function recordVote(): void {
     }
 
     voteCount += 1;
+    userTotalVotes += 1;
     localStorage.setItem(VOTE_KEY, voteCount.toString());
+    localStorage.setItem(VOTE_TOTALS_KEY, userTotalVotes.toString());
+}
+
+export function getMyVotes(): number {
+    return parseInt(localStorage.getItem(VOTE_TOTALS_KEY) || '0', 10);
 }

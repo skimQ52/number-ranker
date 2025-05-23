@@ -1,12 +1,13 @@
 <script setup lang="ts">
     import { Head, Link } from '@inertiajs/vue3';
     import { onMounted, ref } from 'vue';
-    import { canVoteToday, recordVote } from '@/Utils/voteHandler';
+    import { canVoteToday, getMyVotes, recordVote } from '@/Utils/voteHandler';
 
     const leftNum = ref(0);
     const rightNum = ref(0);
     const canVote = ref(true);
     const votesToday = ref(0);
+    const myVotes = ref(0);
     const showDialog = ref(false)
 
     const title = 'Pick The Better Number!';
@@ -31,6 +32,7 @@
     onMounted(() => {
         fetchNumbers()
         canVote.value = canVoteToday();
+        myVotes.value = getMyVotes();
     })
 
     function vote(winner:number) {
@@ -41,6 +43,7 @@
 
         recordVote();
         canVote.value = canVoteToday();
+        myVotes.value = getMyVotes();
 
         const loser = winner === rightNum.value ? leftNum.value : rightNum.value;
 
@@ -76,7 +79,7 @@
         <link rel="stylesheet" href="https://rsms.me/inter/inter.css" />
     </Head>
     <div class="flex min-h-screen flex-col items-center bg-[#FDFDFC] p-6 text-[#1b1b18] dark:bg-[#0a0a0a] lg:justify-center lg:p-8">
-        <header class="flex justify-start not-has-[nav]:hidden mb-6 w-full h-12 text-sm fixed left-0 top-0 z-10 bg-[rgba(0,0,0,0.5)]">
+        <header class="flex justify-between not-has-[nav]:hidden mb-6 w-full h-12 text-sm fixed left-0 top-0 z-10 bg-[rgba(0,0,0,0.5)]">
             <nav class="max-w-screen-xl h-full flex items-center justify-end px-4 sm:px-6 lg:px-8 gap-4">
                 <Link
                     :href="route('leaderboard')"
@@ -85,10 +88,13 @@
                     Leaderboard
                 </Link>
             </nav>
+            <div class="flex h-full text-center items-center mr-4">
+                <h1 class="text-md text-gray-400">You've made {{myVotes}} lifetime votes!</h1>
+            </div>
         </header>
         <div class="flex flex-col mt-10 gap-2 mb-2">
-            <div class="select-none flex gap-4">
-                <h1 class="whitespace-pre text-3xl sm:text-4xl md:text-5xl text-gray-500 font-bold text-center">
+            <div class="select-none flex items-center gap-4">
+                <h1 class="whitespace-pre text-2xl sm:text-3xl md:text-4xl text-gray-500 font-bold text-center">
                     <span
                           v-for="(char, index) in titleChars"
                           :key="index"
@@ -127,7 +133,7 @@
                 </div>
             </div>
             <div class="w-full text-center">
-                <h3 class="text-2xl text-gray-500">
+                <h3 class="text:xl sm:text-2xl text-gray-500">
                     Votes today: <span>{{ votesToday }}</span>
                 </h3>
             </div>
