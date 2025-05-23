@@ -1,4 +1,4 @@
-const MAX_VOTES_PER_DAY = 5;
+const MAX_VOTES_PER_DAY = 30;
 const VOTE_KEY = 'user_votes';
 const VOTE_DATE_KEY = 'vote_date';
 

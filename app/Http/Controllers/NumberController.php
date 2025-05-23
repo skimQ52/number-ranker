@@ -24,7 +24,7 @@ class NumberController extends Controller
             $cacheKey = "votes_by_ip_{$ip}";
 
             $votes = Cache::get($cacheKey, 0);
-            if ($votes >= 15) {
+            if ($votes >= 100) {
                 return response()->json(['message' => 'Vote limit reached'], 429);
             }
 
@@ -73,7 +73,7 @@ class NumberController extends Controller
             $cacheKey = "votes_by_ip_{$ip}";
 
             $votes = Cache::get($cacheKey, 0);
-            if ($votes >= 15) {
+            if ($votes >= 100) {
                 return response()->json(['message' => 'Vote limit reached'], 429);
             }
         }
