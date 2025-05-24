@@ -30,7 +30,7 @@ class NumberController extends Controller
             }
 
             if (!Cache::has($cacheKey)) {
-                Cache::put($cacheKey, 1, now()->endOfDay());
+                Cache::put($cacheKey, 1, Carbon::now('America/New_York')->endOfDay());
             } else {
                 Cache::increment($cacheKey);
             }
@@ -56,7 +56,7 @@ class NumberController extends Controller
         $cacheKey = 'votes_' . Carbon::today()->toDateString();
 
         if (!Cache::has($cacheKey)) {
-            Cache::put($cacheKey, 1, now()->endOfDay());
+            Cache::put($cacheKey, 1, Carbon::now('America/New_York')->endOfDay());
         } else {
             Cache::increment($cacheKey);
         }
