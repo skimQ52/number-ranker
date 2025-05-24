@@ -35,6 +35,8 @@
                 setNumberLeft(data.left);
                 setNumberRight(data.right);
             }
+            leftNum.value = getNumberLeft();
+            rightNum.value = getNumberRight();
             votesToday.value = data.votes;
             totalVotes.value = data.total;
         } catch (error) {
@@ -44,8 +46,6 @@
 
     onMounted(() => {
         fetchNumbers();
-        leftNum.value = getNumberLeft();
-        rightNum.value = getNumberRight();
         canVote.value = canVoteToday();
         myVotes.value = getMyVotes();
     })
