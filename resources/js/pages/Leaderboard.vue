@@ -21,6 +21,16 @@
         myVotes.value = getMyVotes();
     });
 
+    function getBackgroundClass(index: number): string {
+        if (index === 0) return 'bg-gradient-to-r from-yellow-300/50 via-yellow-400/60 to-amber-500/60';
+        if (index === 1) return 'bg-gradient-to-r from-gray-100/50 via-gray-300/70 to-gray-400/60';
+        if (index === 2) return 'bg-gradient-to-r from-orange-300/60 via-amber-500/60 to-orange-600/60\n';
+        if (index < 10) return 'bg-cyan-300/70';
+        if (index < 35) return 'bg-green-300/70';
+        if (index < 60) return 'bg-yellow-200/70';
+        return 'bg-red-300/70';
+    }
+
 </script>
 
 <template>
@@ -45,11 +55,14 @@
         <div class="w-2/3 lg:w-3xl mx-auto py-8 flex-col text-center">
             <h1 class="text-3xl font-bold mb-6 text-amber-50">Leaderboard</h1>
 
-            <ul class="divide-y divide-gray-200 bg-white rounded shadow">
+            <ul class="divide-y divide-black/10 bg-white rounded-xl shadow overflow-hidden">
                 <li
                     v-for="(number, index) in numbers"
                     :key="number.id"
-                    class="flex items-center justify-between p-4"
+                    :class="[
+                        'flex items-center justify-between p-4',
+                        getBackgroundClass(index)
+                    ]"
                 >
                     <span class="w-1/3 text-left">{{index + 1}}.</span>
                     <div class="w-1/3 flex justify-center gap-4">
