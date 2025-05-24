@@ -166,11 +166,25 @@
             </div>
         </div>
         <div v-if="canVote" class="flex flex-col w-1/2 h-120 md:h-220 justify-between lg:flex-row lg:w-full lg:h-150">
-            <button @click="vote(leftNum)" class="h-1/2 lg:w-1/2 lg:h-full flex justify-center items-center hover:bg-gray-800 hover:outline-1 hover:outline-amber-50 transition duration-300 cursor-pointer">
+            <button
+                @click="vote(leftNum)"
+                class="h-1/2 lg:w-1/2 lg:h-full flex justify-center items-center transition duration-300 cursor-pointer
+                    [@media(hover:hover)]:hover:bg-gray-800
+                    [@media(hover:hover)]:hover:outline-1
+                    [@media(hover:hover)]:hover:outline-amber-50
+                    active:scale-95 active:bg-gray-700"
+            >
                 <span class="text-9xl text-amber-50">{{leftNum}}</span>
             </button>
-            <button @click="vote(rightNum)" class="h-1/2 lg:w-1/2 lg:h-full flex justify-center items-center hover:bg-gray-800 hover:outline-1 hover:outline-amber-50 transition duration-300 cursor-pointer">
-                <span class="text-9xl text-amber-50 ">{{rightNum}}</span>
+            <button
+                @click="vote(rightNum)"
+                class="h-1/2 lg:w-1/2 lg:h-full flex justify-center items-center transition duration-300 cursor-pointer
+                    [@media(hover:hover)]:hover:bg-gray-800
+                    [@media(hover:hover)]:hover:outline-1
+                    [@media(hover:hover)]:hover:outline-amber-50
+                    active:scale-95 active:bg-gray-700"
+            >
+                <span class="text-9xl text-amber-50">{{rightNum}}</span>
             </button>
         </div>
         <div v-else class="flex flex-col w-2/3 h-140 md:w-1/2 md:h-250 justify-between lg:flex-row lg:w-full lg:h-150">
