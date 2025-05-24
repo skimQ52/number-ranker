@@ -9,15 +9,23 @@ class NumberService
 
     public static function duo(): array
     {
-        $randomLeft = rand(1,100);
-        $randomRight = rand(1,100);
+        $leftNumber = Number::query()->find(rand(1,100));
 
-        while($randomLeft === $randomRight) {
-            $randomRight = rand(1,100);
+        $baseElo = $leftNumber->elo;
+        $range = rand(1, 10) <= 7 ? 100 : 300;
+
+        $rightNumber = Number::query()
+            ->where('id', '!=', $leftNumber->id)
+            ->whereBetween('elo', [$baseElo - $range, $baseElo + $range])
+            ->inRandomOrder()
+            ->first();
+
+        if (!$rightNumber) {
+            $rightNumber = Number::query()
+                ->where('id', '!=', $leftNumber->id)
+                ->inRandomOrder()
+                ->first();
         }
-
-        $leftNumber = Number::query()->find($randomLeft);
-        $rightNumber = Number::query()->find($randomRight);
 
         return array($leftNumber, $rightNumber);
     }
