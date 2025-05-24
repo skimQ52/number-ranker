@@ -6,9 +6,9 @@ class EloService
 {
     protected int $kFactor; // Adjust the aggressiveness of elo changes
 
-    public function __construct(int $kFactor = 16)
+    public function __construct()
     {
-        $this->kFactor = $kFactor;
+        $this->kFactor = env('K_FACTOR', 16);
     }
 
     public function win(float $playerRating, float $opponentRating): float
