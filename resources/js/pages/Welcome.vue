@@ -2,7 +2,7 @@
     import { Head, Link } from '@inertiajs/vue3';
     import { onMounted, ref } from 'vue';
     import {
-        canVoteToday,
+        canVoteNow,
         clearNumberLeft, clearNumberRight,
         getMyVotes,
         getNumberLeft,
@@ -46,7 +46,7 @@
 
     onMounted(() => {
         fetchNumbers();
-        canVote.value = canVoteToday();
+        canVote.value = canVoteNow();
         myVotes.value = getMyVotes();
     })
 
@@ -57,7 +57,7 @@
         }
 
         recordVote();
-        canVote.value = canVoteToday();
+        canVote.value = canVoteNow();
         myVotes.value = getMyVotes();
 
         const loser = winner === rightNum.value ? leftNum.value : rightNum.value;
@@ -111,7 +111,7 @@
                 </Link>
             </nav>
             <div class="flex h-full text-center items-center mr-4">
-                <h1 class="text-md text-gray-400">You've made <span class="font-bold text-blue-500">{{ myVotes }}</span> lifetime votes!</h1>
+                <h1 class="text-md text-gray-400">You've made <span class="font-bold text-blue-500">{{ myVotes }}</span> lifetime picks!</h1>
             </div>
         </header>
         <div class="flex flex-col mt-10 gap-2 mb-2">
@@ -158,10 +158,10 @@
             </div>
             <div class="flex justify-around w-full text-center">
                 <h3 class="text:xl sm:text-2xl text-gray-400">
-                    <span class="font-bold text-blue-500">{{ votesToday }}</span> Votes Today
+                    <span class="font-bold text-blue-500">{{ votesToday }}</span> Picks Today
                 </h3>
                 <h3 class="text:xl sm:text-2xl text-gray-400">
-                    <span class="font-bold text-blue-500">{{ totalVotes }}</span> Total Votes
+                    <span class="font-bold text-blue-500">{{ totalVotes }}</span> Total Picks
                 </h3>
             </div>
         </div>
@@ -175,8 +175,8 @@
         </div>
         <div v-else class="flex flex-col w-2/3 h-140 md:w-1/2 md:h-250 justify-between lg:flex-row lg:w-full lg:h-150">
             <div class="h-full w-full flex flex-col gap-8 items-center text-center justify-center">
-                <span class="text-3xl sm:text-4xl font-bold text-gray-500">Thank You!</span>
-                <span class="text-xl sm:text-2xl text-gray-600">You've made all of your votes for today</span>
+                <span class="text-3xl sm:text-4xl font-bold text-gray-500">Thank You</span>
+                <span class="text-xl sm:text-2xl text-gray-600">Come back later to make more picks!</span>
                 <Link
                     :href="route('leaderboard')"
                     class="bg-gray-900 inline-block rounded-sm border border-transparent px-5 py-1.5 text-sm leading-normal text-[#1b1b18] hover:border-[#19140035] dark:text-[#EDEDEC] dark:hover:border-[#3E3E3A]"

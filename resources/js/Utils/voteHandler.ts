@@ -1,22 +1,24 @@
-const MAX_VOTES_PER_DAY = 30;
-const VOTE_KEY = 'user_votes';
+const MAX_VOTES_PER_PERIOD = 30;
+const COOLDOWN_HOURS = 8;
+const COOLDOWN_MS = COOLDOWN_HOURS * 60 * 60 * 1000;
+const VOTE_COUNT_KEY = 'vote_count';
 const VOTE_TOTALS_KEY = 'users_total_votes';
-const VOTE_DATE_KEY = 'vote_date';
+const VOTE_WINDOW_KEY = 'vote_window_start';
 const NUMBER_LEFT_KEY = 'number_left';
 const NUMBER_RIGHT_KEY = 'number_right';
 
-export function canVoteToday(): boolean {
-    const today = new Date().toDateString();
-    const storedDate = localStorage.getItem(VOTE_DATE_KEY);
-    const voteCount = parseInt(localStorage.getItem(VOTE_KEY) || '0', 10);
+export function canVoteNow(): boolean {
+    const now = Date.now();
+    const windowStart = parseInt(localStorage.getItem(VOTE_WINDOW_KEY) || '0', 10);
+    const voteCount = parseInt(localStorage.getItem(VOTE_COUNT_KEY) || '0', 10);
 
-    if (storedDate !== today) {
-        localStorage.setItem(VOTE_DATE_KEY, today);
-        localStorage.setItem(VOTE_KEY, '0');
+    if (!windowStart || now - windowStart > COOLDOWN_MS) {
+        localStorage.setItem(VOTE_WINDOW_KEY, now.toString());
+        localStorage.setItem(VOTE_COUNT_KEY, '0');
         return true;
     }
 
-    return voteCount < MAX_VOTES_PER_DAY;
+    return voteCount < MAX_VOTES_PER_PERIOD;
 }
 
 export function getNumberLeft(): number {
@@ -44,19 +46,22 @@ export function clearNumberRight(): void {
 }
 
 export function recordVote(): void {
-    const today = new Date().toDateString();
-    let voteCount = parseInt(localStorage.getItem(VOTE_KEY) || '0', 10);
-    let userTotalVotes = parseInt(localStorage.getItem(VOTE_TOTALS_KEY) || '0', 10);
+    const now = Date.now();
+    let windowStart = parseInt(localStorage.getItem(VOTE_WINDOW_KEY) || '0', 10);
+    let voteCount = parseInt(localStorage.getItem(VOTE_COUNT_KEY) || '0', 10);
+    let totalVotes = parseInt(localStorage.getItem(VOTE_TOTALS_KEY) || '0', 10);
 
-    if (localStorage.getItem(VOTE_DATE_KEY) !== today) {
-        localStorage.setItem(VOTE_DATE_KEY, today);
+    if (!windowStart || now - windowStart > COOLDOWN_MS) {
+        windowStart = now;
         voteCount = 0;
+        localStorage.setItem(VOTE_WINDOW_KEY, windowStart.toString());
     }
 
     voteCount += 1;
-    userTotalVotes += 1;
-    localStorage.setItem(VOTE_KEY, voteCount.toString());
-    localStorage.setItem(VOTE_TOTALS_KEY, userTotalVotes.toString());
+    totalVotes += 1;
+
+    localStorage.setItem(VOTE_COUNT_KEY, voteCount.toString());
+    localStorage.setItem(VOTE_TOTALS_KEY, totalVotes.toString());
 }
 
 export function getMyVotes(): number {
