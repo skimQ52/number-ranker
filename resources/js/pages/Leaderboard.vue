@@ -16,16 +16,6 @@
         }
     }
 
-    function getBackgroundClass(index: number): string {
-        if (index === 0) return 'bg-gradient-to-r from-yellow-300/70 via-yellow-500/60 to-amber-500/60';
-        if (index === 1) return 'bg-gradient-to-r from-gray-100/70 via-gray-300/60 to-gray-400/60';
-        if (index === 2) return 'bg-gradient-to-r from-orange-300/70 via-amber-500/50 to-orange-600/60';
-        if (index < 10) return 'bg-cyan-200';
-        if (index < 30) return 'bg-green-200';
-        if (index < 60) return 'bg-yellow-200/70';
-        return 'bg-red-300/70';
-    }
-
     onMounted(() => {
         fetchLeaderboard();
         myVotes.value = getMyVotes();
@@ -49,20 +39,17 @@
                 </Link>
             </nav>
             <div class="flex h-full text-center items-center mr-4">
-                <h1 class="text-md text-gray-400">You've made <span class="font-bold text-blue-500">{{ myVotes }}</span> lifetime picks!</h1>
+                <h1 class="text-md text-gray-400">You've made <span class="font-bold text-blue-500">{{ myVotes }}</span> lifetime votes!</h1>
             </div>
         </header>
-        <div class="w-9/10 md:w-2/3 lg:w-3xl mx-auto py-8 flex-col text-center">
+        <div class="w-2/3 lg:w-3xl mx-auto py-8 flex-col text-center">
             <h1 class="text-3xl font-bold mb-6 text-amber-50">Leaderboard</h1>
 
-            <ul class="divide-y divide-gray-300 bg-white rounded-xl shadow overflow-hidden">
+            <ul class="divide-y divide-gray-200 bg-white rounded shadow">
                 <li
                     v-for="(number, index) in numbers"
                     :key="number.id"
-                    :class="[
-                        'flex items-center justify-between p-4',
-                        getBackgroundClass(index)
-                    ]"
+                    class="flex items-center justify-between p-4"
                 >
                     <span class="w-1/3 text-left">{{index + 1}}.</span>
                     <div class="w-1/3 flex justify-center gap-4">
