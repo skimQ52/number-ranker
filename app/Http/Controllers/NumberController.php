@@ -53,7 +53,7 @@ class NumberController extends Controller
             'losses' => $winner->losses + 1,
         ]);
 
-        $cacheKey = 'votes_' . Carbon::today()->toDateString();
+        $cacheKey = 'votes_' . Carbon::today('America/New_York')->toDateString();
 
         if (!Cache::has($cacheKey)) {
             Cache::put($cacheKey, 1, Carbon::now('America/New_York')->endOfDay());
@@ -92,7 +92,7 @@ class NumberController extends Controller
     public function returnForNextVote(): JsonResponse
     {
         [$leftNumber, $rightNumber] = NumberService::duo();
-        $votesToday = Cache::get('votes_' . Carbon::today()->toDateString(), 0);
+        $votesToday = Cache::get('votes_' . Carbon::today('America/New_York')->toDateString(), 0);
         $totalVotes = Number::query()->sum('wins');
 
         return response()->json([
