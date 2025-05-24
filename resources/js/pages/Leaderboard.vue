@@ -22,9 +22,9 @@
     });
 
     function getBackgroundClass(index: number): string {
-        if (index === 0) return 'bg-gradient-to-r from-yellow-300/50 via-yellow-400/60 to-amber-500/60';
+        if (index === 0) return 'bg-gradient-to-r from-yellow-300/50 via-yellow-400/60 to-amber-500/55';
         if (index === 1) return 'bg-gradient-to-r from-gray-100/50 via-gray-300/70 to-gray-400/60';
-        if (index === 2) return 'bg-gradient-to-r from-orange-300/60 via-amber-500/60 to-orange-600/60\n';
+        if (index === 2) return 'bg-gradient-to-r from-orange-300/60 via-amber-500/60 to-orange-600/55\n';
         if (index < 10) return 'bg-cyan-300/70';
         if (index < 35) return 'bg-green-300/70';
         if (index < 60) return 'bg-yellow-200/70';
@@ -49,7 +49,7 @@
                 </Link>
             </nav>
             <div class="flex h-full text-center items-center mr-4">
-                <h1 class="text-md text-gray-400">You've made <span class="font-bold text-blue-500">{{ myVotes }}</span> lifetime votes!</h1>
+                <h1 class="text-md text-gray-400">You've made <span class="font-bold text-blue-500">{{ myVotes }}</span> lifetime picks!</h1>
             </div>
         </header>
         <div class="w-2/3 lg:w-3xl mx-auto py-8 flex-col text-center">
