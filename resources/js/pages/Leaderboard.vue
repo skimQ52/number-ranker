@@ -52,7 +52,7 @@
                 <h1 class="text-md text-gray-400">You've made <span class="font-bold text-blue-500">{{ myVotes }}</span> lifetime picks!</h1>
             </div>
         </header>
-        <div class="w-2/3 lg:w-3xl mx-auto py-8 flex-col text-center">
+        <div class="w-8/9 lg:w-3xl mx-auto py-8 flex-col text-center">
             <h1 class="text-3xl font-bold mb-6 text-amber-50">Leaderboard</h1>
 
             <ul class="divide-y divide-black/10 bg-white rounded-xl shadow overflow-hidden">
