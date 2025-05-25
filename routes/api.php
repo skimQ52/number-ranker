@@ -10,12 +10,14 @@ Route::get('/user', function (Request $request) {
 })->middleware('auth:sanctum');
 
 
-Route::post('/numbers', [NumberController::class, 'vote']);
+Route::middleware('throttle:100,10')->group(function () {
+    Route::post('/numbers', [NumberController::class, 'vote']);
+    Route::get('/numbers', [NumberController::class, 'duo']);
+    Route::get('/rankings', [NumberController::class, 'index']);
+});
 
-Route::get('/numbers', [NumberController::class, 'duo']);
-
-Route::get('/rankings', [NumberController::class, 'index']);
-
-Route::get('/votes/{number}', [VoteController::class, 'votes']);
-Route::get('/wins/{number}', [VoteController::class, 'wins']);
-Route::get('/losses/{number}', [VoteController::class, 'losses']);
+Route::middleware('throttle:30,1')->group(function () {
+    Route::get('/votes/{number}', [VoteController::class, 'votes']);
+    Route::get('/wins/{number}', [VoteController::class, 'wins']);
+    Route::get('/losses/{number}', [VoteController::class, 'losses']);
+});
