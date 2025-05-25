@@ -10,7 +10,7 @@ Route::get('/user', function (Request $request) {
 })->middleware('auth:sanctum');
 
 
-Route::middleware('throttle:100,10')->group(function () {
+Route::middleware('throttle:200,10')->group(function () {
     Route::post('/numbers', [NumberController::class, 'vote']);
     Route::get('/numbers', [NumberController::class, 'duo']);
     Route::get('/rankings', [NumberController::class, 'index']);
