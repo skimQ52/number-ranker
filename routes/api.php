@@ -16,7 +16,7 @@ Route::middleware('throttle:100,10')->group(function () {
     Route::get('/rankings', [NumberController::class, 'index']);
 });
 
-Route::middleware('throttle:30,1')->group(function () {
+Route::middleware('throttle:60,1')->group(function () {
     Route::get('/votes/{number}', [VoteController::class, 'votes']);
     Route::get('/wins/{number}', [VoteController::class, 'wins']);
     Route::get('/losses/{number}', [VoteController::class, 'losses']);
