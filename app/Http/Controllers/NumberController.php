@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Number;
+use App\Models\Vote;
 use App\Services\EloService;
 use App\Services\NumberService;
 use Illuminate\Http\JsonResponse;
@@ -36,9 +37,13 @@ class NumberController extends Controller
             }
         }
 
-
         $winner = Number::query()->find($validated['winner']);
         $loser = Number::query()->find($validated['loser']);
+
+        Vote::query()->create([
+            'winner_id' => $winner->id,
+            'loser_id' => $loser->id,
+        ]);
 
         $newWinnerElo = $eloService->win($winner->elo, $loser->elo);
         $newLoserElo = $eloService->loss($loser->elo, $winner->elo);

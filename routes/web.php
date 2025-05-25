@@ -11,6 +11,12 @@ Route::get('/leaderboard', function () {
     return Inertia::render('Leaderboard');
 })->name('leaderboard');
 
+Route::get('/votes/{number}', function ($number) {
+    return Inertia::render('Votes/Show', [
+        'numberId' => $number
+    ]);
+});
+
 //Route::get('dashboard', function () {
 //    return Inertia::render('Dashboard');
 //})->middleware(['auth', 'verified'])->name('dashboard');

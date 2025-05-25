@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\NumberController;
+use App\Http\Controllers\VoteController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -14,3 +15,7 @@ Route::post('/numbers', [NumberController::class, 'vote']);
 Route::get('/numbers', [NumberController::class, 'duo']);
 
 Route::get('/rankings', [NumberController::class, 'index']);
+
+Route::get('/votes/{number}', [VoteController::class, 'votes']);
+Route::get('/wins/{number}', [VoteController::class, 'wins']);
+Route::get('/losses/{number}', [VoteController::class, 'losses']);

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-    import { Head, Link } from '@inertiajs/vue3';
+    import { Head, Link, router } from '@inertiajs/vue3';
     import { onMounted, ref } from 'vue';
     import { getMyVotes } from '@/Utils/voteHandler';
 
@@ -31,6 +31,10 @@
         return 'bg-red-300/70';
     }
 
+    function goToNumberVotes(numberId: number) {
+        router.visit(`/votes/${numberId}`)
+    }
+
 </script>
 
 <template>
@@ -55,14 +59,15 @@
         <div class="w-8/9 lg:w-3xl mx-auto py-8 flex-col text-center">
             <h1 class="text-3xl font-bold mb-6 text-amber-50">Leaderboard</h1>
 
-            <ul class="divide-y divide-black/10 bg-white rounded-xl shadow overflow-hidden">
+            <ul class="divide-y  divide-black/10 bg-white rounded-xl shadow overflow-hidden">
                 <li
                     v-for="(number, index) in numbers"
                     :key="number.id"
                     :class="[
-                        'flex items-center justify-between p-4',
+                        'flex items-center justify-between p-4 transition-transform duration-200 ease-in-out hover:scale-101 cursor-pointer select-none',
                         getBackgroundClass(index)
                     ]"
+                    @click="goToNumberVotes(number.id)"
                 >
                     <span class="w-1/3 text-left">{{index + 1}}.</span>
                     <div class="w-1/3 flex justify-center gap-4">
