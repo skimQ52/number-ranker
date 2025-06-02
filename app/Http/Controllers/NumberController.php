@@ -37,6 +37,14 @@ class NumberController extends Controller
             }
         }
 
+        $hash = md5($request->ip . $validated['winner'] . $validated['loser']);
+
+        if (Cache::has("vote:$hash")) {
+            return response()->json(['message' => 'Armanding Detected'], 429);
+        }
+
+        Cache::put("vote:$hash", true, now()->addHour());
+
         $winner = Number::query()->find($validated['winner']);
         $loser = Number::query()->find($validated['loser']);
 
