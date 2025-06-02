@@ -21,7 +21,7 @@ class NumberController extends Controller
             'loser' => 'required|integer|between:1,99'
         ]);
 
-        if (env('VOTE_RATE_LIMIT_ENABLED', false)) {
+        if (env('VOTE_RATE_LIMIT_ENABLED', true)) {
             $ip = $request->ip();
             $cacheKey = "votes_by_ip_{$ip}";
 
@@ -37,13 +37,15 @@ class NumberController extends Controller
             }
         }
 
-        $hash = md5($request->ip . $validated['winner'] . $validated['loser']);
+        $hash = md5($request->ip() . $validated['winner'] . $validated['loser']);
+        $currentVotes = Cache::get("vote:$hash", 0);
 
-        if (Cache::has("vote:$hash")) {
+        if ($currentVotes >= 3) {
             return response()->json(['message' => 'Armanding Detected'], 429);
         }
 
-        Cache::put("vote:$hash", true, now()->addHour());
+        Cache::put("vote:$hash", $currentVotes + 1, now()->addHours(8));
+
 
         $winner = Number::query()->find($validated['winner']);
         $loser = Number::query()->find($validated['loser']);
@@ -79,16 +81,6 @@ class NumberController extends Controller
 
     public function duo(Request $request): JsonResponse
     {
-        if (env('VOTE_RATE_LIMIT_ENABLED', false)) {
-            $ip = $request->ip();
-            $cacheKey = "votes_by_ip_{$ip}";
-
-            $votes = Cache::get($cacheKey, 0);
-            if ($votes >= 100) {
-                return response()->json(['message' => 'Vote limit reached'], 429);
-            }
-        }
-
         return $this->returnForNextVote();
     }
 
