@@ -6,6 +6,7 @@ const VOTE_TOTALS_KEY = 'users_total_votes';
 const VOTE_WINDOW_KEY = 'vote_window_start';
 const NUMBER_LEFT_KEY = 'number_left';
 const NUMBER_RIGHT_KEY = 'number_right';
+const HANDSHAKE_KEY = 'vote_handshake';
 
 export function canVoteNow(): boolean {
     const now = Date.now();
@@ -43,6 +44,18 @@ export function clearNumberLeft(): void {
 
 export function clearNumberRight(): void {
     localStorage.removeItem(NUMBER_RIGHT_KEY);
+}
+
+export function setHandshake(value: string) {
+    localStorage.setItem(HANDSHAKE_KEY, value);
+}
+
+export function getHandshake(): string {
+    return localStorage.getItem(HANDSHAKE_KEY) || '';
+}
+
+export function clearHandshake(): void {
+    localStorage.removeItem(HANDSHAKE_KEY);
 }
 
 export function recordVote(): void {

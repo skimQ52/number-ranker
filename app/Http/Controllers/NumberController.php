@@ -11,7 +11,9 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 
 class NumberController extends Controller
 {
@@ -19,8 +21,32 @@ class NumberController extends Controller
     {
         $validated = $request->validate([
             'winner' => 'required|integer|between:1,99',
-            'loser' => 'required|integer|between:1,99'
+            'loser' => 'required|integer|between:1,99',
+            'handshake' => 'required|string'
         ]);
+
+        try {
+            $data = Crypt::decrypt($request->input('handshake'));
+
+            $nonceKey = 'handshake_nonce_' . $data['nonce'];
+            if (Cache::has($nonceKey)) {
+                return response()->json(['message' => 'Replay detected'], 403);
+            }
+
+            Cache::put($nonceKey, true, 300);
+        } catch (\Exception $e) {
+            return response()->json(['message' => 'Invalid handshake'], 403);
+        }
+
+        $submittedPair = collect([$validated['winner'], $validated['loser']])->sort()->values()->toArray();
+
+        if ($data['pair'] != $submittedPair) {
+            return response()->json(['message' => 'Handshake vote pair mismatch'], 403);
+        }
+
+        if ($validated['winner'] === $validated['loser']) {
+            return response()->json(['message' => 'Invalid vote: numbers must differ'], 422);
+        }
 
         $ip = $request->ip();
 
@@ -47,7 +73,7 @@ class NumberController extends Controller
 
         $loser->update([
             'elo' => $newLoserElo,
-            'losses' => $winner->losses + 1,
+            'losses' => $loser->losses + 1,
         ]);
 
         $cacheKey = 'votes_' . Carbon::today('America/New_York')->toDateString();
@@ -58,12 +84,12 @@ class NumberController extends Controller
             Cache::increment($cacheKey);
         }
 
-        return $this->returnForNextVote();
+        return $this->returnForNextVote($request);
     }
 
-    public function duo(): JsonResponse
+    public function duo(Request $request): JsonResponse
     {
-        return $this->returnForNextVote();
+        return $this->returnForNextVote($request);
     }
 
     public function index(): JsonResponse
@@ -73,17 +99,35 @@ class NumberController extends Controller
         return response()->json($numbers);
     }
 
-    public function returnForNextVote(): JsonResponse
+    public function returnForNextVote(Request $request): JsonResponse
     {
-        [$leftNumber, $rightNumber] = NumberService::duo();
+
         $votesToday = Cache::get('votes_' . Carbon::today('America/New_York')->toDateString(), 0);
         $totalVotes = Number::query()->sum('wins');
 
+        if ($request->boolean('meta_only')) {
+            return response()->json([
+                'votes' => $votesToday,
+                'total' => $totalVotes,
+            ]);
+        }
+
+        $duo = NumberService::duo();
+
+        $handshakeData = [
+            'pair' => $duo['pair'],
+            'issued_at' => now()->timestamp,
+            'nonce' => Str::random(8)
+        ];
+
+        $handshake = Crypt::encrypt($handshakeData);
+
         return response()->json([
-            'left' => $leftNumber->number,
-            'right' => $rightNumber->number,
+            'left' => $duo['left'],
+            'right' => $duo['right'],
             'votes' => $votesToday,
             'total' => $totalVotes,
+            'handshake' => $handshake,
         ]);
     }
 }
